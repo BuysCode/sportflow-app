@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ReservationTable } from "@/components/admin/ReservationTable"
+import { Reservation, ReservationTable } from "@/components/admin/ReservationTable"
 import { BookingForm } from "@/components/booking/BookingForm"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,32 +10,41 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { type BookingFormValues } from "@/lib/schema"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
-const mockReservations = [
+const mockReservations: Reservation[] = [
   {
     id: "1",
-    nome: "João Silva",
-    telefone: "11999999999",
-    data: new Date(2026, 4, 18, 0, 0, 0),
-    hora: "09:00",
+    name: "João Silva",
+    phoneNumber: "11999999999",
+    date: new Date(2026, 4, 18, 0, 0, 0),
+    hour: "09:00",
+    sport: "Futebol",
+    courtId: "cm8abc123",
     status: "confirmada" as const,
   },
   {
     id: "2",
-    nome: "Maria Santos",
-    telefone: "11988888888",
-    data: new Date(2026, 4, 18, 0, 0, 0),
-    hora: "10:00",
+    name: "Maria Santos",
+    phoneNumber: "11988888888",
+    date: new Date(2026, 4, 18, 0, 0, 0),
+    hour: "10:00",
+    sport: "Tênis",
+    courtId: "cm8def456",
     status: "pendente" as const,
   },
   {
     id: "3",
-    nome: "Carlos Oliveira",
-    telefone: "11977777777",
-    data: new Date(2026, 4, 19, 0, 0, 0),
-    hora: "14:00",
+    name: "Carlos Oliveira",
+    phoneNumber: "11977777777",
+    date: new Date(2026, 4, 19, 0, 0, 0),
+    hour: "14:00",
+    sport: "Basquete",
+    courtId: "cm8ghi789",
     status: "confirmada" as const,
   },
 ]
@@ -45,30 +54,45 @@ export default function AdminPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleNewReservation = (data: BookingFormValues) => {
-    const newReservation = {
-      id: String(reservations.length + 1),
-      nome: data.nome,
-      telefone: data.telefone,
-      data: data.data,
-      hora: data.hora,
-      status: "pendente" as const,
+  const handleNewReservation = async (data: BookingFormValues) => {
+    setIsLoading(true)
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const newReservation = {
+        id: String(reservations.length + 1),
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        date: data.date,
+        hour: data.hour,
+        sport: data.sport,
+        courtId: data.courtId,
+        status: "pendente" as const,
+      }
+      setReservations([...reservations, newReservation])
+      setDialogOpen(false)
+      setSelectedDate(undefined)
+      setSelectedTime(null)
+      toast.success("Reserva criada com sucesso!", {
+        description: `${data.name} - ${data.hour}`,
+      })
+    } catch {
+      toast.error("Erro ao criar reserva", {
+        description: "Tente novamente mais tarde.",
+      })
+    } finally {
+      setIsLoading(false)
     }
-    setReservations([...reservations, newReservation])
-    setDialogOpen(false)
-    setSelectedDate(undefined)
-    setSelectedTime(null)
-    alert("Nova reserva criada com sucesso!")
   }
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Dashboard Administrativo</h1>
+      <div className="mx-auto max-w-4xl w-full">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-bold sm:text-3xl">Dashboard Administrativo</h1>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger className={'cursor-pointer'}>
+            <DialogTrigger>
               Nova Reserva Manual
             </DialogTrigger>
             <DialogContent>
@@ -80,11 +104,30 @@ export default function AdminPage() {
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
               />
+              <DialogFooter>
+                <Button
+                  type="submit"
+                  form="booking-form"
+                  disabled={isLoading}
+                  className="w-full sm:w-auto"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    "Criar Reserva"
+                  )}
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
 
-        <ReservationTable reservations={reservations} />
+        <div className="overflow-x-auto">
+          <ReservationTable reservations={reservations} />
+        </div>
       </div>
     </div>
   )

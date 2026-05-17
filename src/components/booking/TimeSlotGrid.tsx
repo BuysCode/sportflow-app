@@ -17,7 +17,7 @@ export function TimeSlotGrid({
   bookedSlots = [],
 }: TimeSlotGridProps) {
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
       {availableSlots.map((slot) => {
         const isBooked = bookedSlots.includes(slot)
         const isSelected = selectedTime === slot

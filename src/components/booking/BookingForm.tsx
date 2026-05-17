@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { bookingSchema, type BookingFormValues } from "@/lib/schema"
+import { phoneNumberMask } from "@/lib/functions/phoneNumberMask"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -20,38 +21,42 @@ export function BookingForm({ onSubmit, selectedDate, selectedTime }: BookingFor
   } = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      nome: "",
-      telefone: "",
+      name: "",
+      phoneNumber: "",
     },
   })
 
   const handleFormSubmit = (data: BookingFormValues) => {
     onSubmit({
       ...data,
-      data: selectedDate ?? new Date(),
-      hora: selectedTime ?? "",
+      date: selectedDate ?? new Date(),
+      hour: selectedTime ?? "",
     })
   }
 
   return (
     <form id="booking-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="nome">Nome</Label>
-        <Input id="nome" placeholder="Seu nome completo" {...register("nome")} />
-        {errors.nome && (
-          <p className="text-sm text-destructive">{errors.nome.message}</p>
+        <Label htmlFor="name">Nome</Label>
+        <Input id="name" placeholder="Seu nome completo" {...register("name")} />
+        {errors.name && (
+          <p className="text-sm text-destructive">{errors.name.message}</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="telefone">WhatsApp</Label>
+        <Label htmlFor="phoneNumber">WhatsApp</Label>
         <Input
-          id="telefone"
+          id="phoneNumber"
           placeholder="(11) 99999-9999"
-          {...register("telefone")}
+          {...register("phoneNumber", {
+            onChange: (e) => {
+              e.target.value = phoneNumberMask(e.target.value)
+            },
+          })}
         />
-        {errors.telefone && (
-          <p className="text-sm text-destructive">{errors.telefone.message}</p>
+        {errors.phoneNumber && (
+          <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
         )}
       </div>
     </form>

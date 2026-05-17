@@ -10,18 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '../ui/dialog'
 
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
-interface Reservation {
+export interface Reservation {
   id: string
-  nome: string
-  telefone: string
-  data: Date
-  hora: string
+  name: string
+  phoneNumber: string
+  date: Date
+  hour: string
+  sport: string
+  courtId: string
   status: "confirmada" | "pendente" | "cancelada"
 }
 
@@ -30,16 +31,16 @@ interface ReservationTableProps {
 }
 
 export function ReservationTable({ reservations }: ReservationTableProps) {
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Data</TableHead>
-          <TableHead>Horário</TableHead>
+          <TableHead className="hidden sm:table-cell">Horário</TableHead>
           <TableHead>Cliente</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead className="hidden md:table-cell">Status</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
@@ -47,11 +48,11 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
         {reservations.map((reservation) => (
           <TableRow key={reservation.id}>
             <TableCell>
-              {format(reservation.data, "dd/MM/yyyy", { locale: ptBR })}
+              {format(reservation.date, "dd/MM/yyyy", { locale: ptBR })}
             </TableCell>
-            <TableCell>{reservation.hora}</TableCell>
-            <TableCell>{reservation.nome}</TableCell>
-            <TableCell>
+            <TableCell className="hidden sm:table-cell">{reservation.hour}</TableCell>
+            <TableCell>{reservation.name}</TableCell>
+            <TableCell className="hidden md:table-cell">
               <span
                 className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${reservation.status === "confirmada"
                   ? "bg-green-100 text-green-800"
@@ -64,15 +65,54 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
               </span>
             </TableCell>
             <TableCell>
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger className={'cursor-pointer'}>
+              <Dialog>
+                <DialogTrigger onClick={() => setSelectedReservation(reservation)}>
                   Ver Detalhes
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Nova Reserva Manual</DialogTitle>
+                    <DialogTitle>Detalhes da Reserva</DialogTitle>
+                    <DialogDescription>
+                      Informações completas sobre a reserva.
+                    </DialogDescription>
                   </DialogHeader>
-                  <h1>Detalhes</h1>
+                  {selectedReservation && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Cliente</p>
+                        <p className="text-base">{selectedReservation.name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Telefone</p>
+                        <p className="text-base">{selectedReservation.phoneNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Data</p>
+                        <p className="text-base">{format(selectedReservation.date, "dd/MM/yyyy", { locale: ptBR })}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Horário</p>
+                        <p className="text-base">{selectedReservation.hour}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Esporte</p>
+                        <p className="text-base">{selectedReservation.sport}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Status</p>
+                        <span
+                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${selectedReservation.status === "confirmada"
+                            ? "bg-green-100 text-green-800"
+                            : selectedReservation.status === "pendente"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                            }`}
+                        >
+                          {selectedReservation.status.charAt(0).toUpperCase() + selectedReservation.status.slice(1)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </DialogContent>
               </Dialog>
             </TableCell>

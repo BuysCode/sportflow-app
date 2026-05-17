@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { type BookingFormValues } from "@/lib/schema"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 const availableSlots = [
   "08:00", "09:00", "10:00", "11:00",
@@ -18,19 +20,32 @@ const availableSlots = [
 export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleBookingSubmit = (data: BookingFormValues) => {
-    console.log("Reserva enviada:", {
-      nome: data.nome,
-      telefone: data.telefone,
-      data: format(data.data, "dd/MM/yyyy", { locale: ptBR }),
-      hora: data.hora,
-    })
-    alert(`Reserva confirmada!
-
-Nome: ${data.nome}
-Data: ${format(data.data, "dd/MM/yyyy", { locale: ptBR })}
-Horário: ${data.hora}`)
+  const handleBookingSubmit = async (data: BookingFormValues) => {
+    setIsLoading(true)
+    try {
+      console.log("Reserva enviada:", {
+        courtId: data.courtId,
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        date: format(data.date, "dd/MM/yyyy", { locale: ptBR }),
+        hour: data.hour,
+        sport: data.sport
+      })
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      toast.success("Reserva confirmada!", {
+        description: `${data.name} - ${format(data.date, "dd/MM/yyyy", { locale: ptBR })} às ${data.hour}`,
+      })
+      setSelectedDate(undefined)
+      setSelectedTime(null)
+    } catch {
+      toast.error("Erro ao confirmar reserva", {
+        description: "Tente novamente mais tarde.",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSelectTime = (time: string) => {
@@ -42,12 +57,12 @@ Horário: ${data.hora}`)
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="mb-8 text-center text-3xl font-bold">Agendamento</h1>
+        <h1 className="mb-6 text-center text-2xl font-bold sm:mb-8 sm:text-3xl">Agendamento</h1>
 
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
           <div className="space-y-6">
             <div>
-              <h2 className="mb-4 text-xl font-semibold">Selecione a Data</h2>
+              <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Selecione a Data</h2>
               <DateSelector
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
@@ -55,7 +70,7 @@ Horário: ${data.hora}`)
             </div>
 
             <div>
-              <h2 className="mb-4 text-xl font-semibold">Selecione o Horário</h2>
+              <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Selecione o Horário</h2>
               <TimeSlotGrid
                 selectedTime={selectedTime}
                 onSelectTime={handleSelectTime}
@@ -65,7 +80,7 @@ Horário: ${data.hora}`)
           </div>
 
           <div>
-            <h2 className="mb-4 text-xl font-semibold">Seus Dados</h2>
+            <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Seus Dados</h2>
             <BookingForm
               onSubmit={handleBookingSubmit}
               selectedDate={selectedDate}
@@ -73,11 +88,18 @@ Horário: ${data.hora}`)
             />
             <Button
               className="mt-4 w-full"
-              disabled={isFormDisabled}
+              disabled={isFormDisabled || isLoading}
               type="submit"
               form="booking-form"
             >
-              Confirmar Agendamento
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                "Confirmar Agendamento"
+              )}
             </Button>
           </div>
         </div>
