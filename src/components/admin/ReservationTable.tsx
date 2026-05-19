@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { phoneNumberMask } from '@/lib/functions/phoneNumberMask'
 
 export interface Reservation {
   id: string
@@ -22,7 +23,8 @@ export interface Reservation {
   date: Date
   hour: string
   sport: string
-  courtId: string
+  courtType: "areia" | "salao"
+  courtNumber: string
   status: "confirmada" | "pendente" | "cancelada"
 }
 
@@ -66,7 +68,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
             </TableCell>
             <TableCell>
               <Dialog>
-                <DialogTrigger onClick={() => setSelectedReservation(reservation)}>
+                <DialogTrigger className={'bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg'} onClick={() => setSelectedReservation(reservation)}>
                   Ver Detalhes
                 </DialogTrigger>
                 <DialogContent>
@@ -84,7 +86,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Telefone</p>
-                        <p className="text-base">{selectedReservation.phoneNumber}</p>
+                        <p className="text-base">{phoneNumberMask(selectedReservation.phoneNumber)}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Data</p>
@@ -93,6 +95,10 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Horário</p>
                         <p className="text-base">{selectedReservation.hour}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Quadra</p>
+                        <p className="text-base">{selectedReservation.courtType === "areia" ? "Areia" : "Salão"} - Quadra {selectedReservation.courtNumber}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">Esporte</p>

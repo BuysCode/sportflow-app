@@ -24,7 +24,8 @@ const mockReservations: Reservation[] = [
     date: new Date(2026, 4, 18, 0, 0, 0),
     hour: "09:00",
     sport: "Futebol",
-    courtId: "cm8abc123",
+    courtType: "areia",
+    courtNumber: "1",
     status: "confirmada" as const,
   },
   {
@@ -34,7 +35,8 @@ const mockReservations: Reservation[] = [
     date: new Date(2026, 4, 18, 0, 0, 0),
     hour: "10:00",
     sport: "Tênis",
-    courtId: "cm8def456",
+    courtType: "salao",
+    courtNumber: "2",
     status: "pendente" as const,
   },
   {
@@ -44,7 +46,8 @@ const mockReservations: Reservation[] = [
     date: new Date(2026, 4, 19, 0, 0, 0),
     hour: "14:00",
     sport: "Basquete",
-    courtId: "cm8ghi789",
+    courtType: "salao",
+    courtNumber: "3",
     status: "confirmada" as const,
   },
 ]
@@ -52,14 +55,14 @@ const mockReservations: Reservation[] = [
 export default function AdminPage() {
   const [reservations, setReservations] = useState(mockReservations)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleNewReservation = async (data: BookingFormValues) => {
     setIsLoading(true)
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
+      const courtId = data.court
+      const [courtNumber, courtType] = courtId.split("-")
       const newReservation = {
         id: String(reservations.length + 1),
         name: data.name,
@@ -67,13 +70,12 @@ export default function AdminPage() {
         date: data.date,
         hour: data.hour,
         sport: data.sport,
-        courtId: data.courtId,
+        courtType: courtType as "areia" | "salao",
+        courtNumber,
         status: "pendente" as const,
       }
       setReservations([...reservations, newReservation])
       setDialogOpen(false)
-      setSelectedDate(undefined)
-      setSelectedTime(null)
       toast.success("Reserva criada com sucesso!", {
         description: `${data.name} - ${data.hour}`,
       })
@@ -91,25 +93,27 @@ export default function AdminPage() {
       <div className="mx-auto max-w-4xl w-full">
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold sm:text-3xl">Dashboard Administrativo</h1>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger>
-              Nova Reserva Manual
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <a href="/admin/courts" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer p-2 rounded-lg">
+              Gerenciar Quadras
+            </a>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger className={'bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg'}>
+                Nova Reserva Manual
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Nova Reserva Manual</DialogTitle>
               </DialogHeader>
               <BookingForm
                 onSubmit={handleNewReservation}
-                selectedDate={selectedDate}
-                selectedTime={selectedTime}
               />
               <DialogFooter>
                 <Button
                   type="submit"
                   form="booking-form"
                   disabled={isLoading}
-                  className="w-full sm:w-auto"
+                  className="bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg w-full sm:w-auto"
                 >
                   {isLoading ? (
                     <>
@@ -123,6 +127,7 @@ export default function AdminPage() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

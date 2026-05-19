@@ -31,7 +31,7 @@ export function TimeSlotGrid({
             className={cn(
               "w-full",
               isBooked && "bg-muted text-muted-foreground cursor-not-allowed",
-              isSelected && "bg-primary text-primary-foreground"
+              isSelected && "bg-blue-600 text-white"
             )}
           >
             {slot}

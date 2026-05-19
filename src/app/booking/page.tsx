@@ -1,8 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { DateSelector } from "@/components/booking/DateSelector"
-import { TimeSlotGrid } from "@/components/booking/TimeSlotGrid"
 import { BookingForm } from "@/components/booking/BookingForm"
 import { Button } from "@/components/ui/button"
 import { type BookingFormValues } from "@/lib/schema"
@@ -18,15 +16,14 @@ const availableSlots = [
 ]
 
 export default function BookingPage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleBookingSubmit = async (data: BookingFormValues) => {
     setIsLoading(true)
     try {
       console.log("Reserva enviada:", {
-        courtId: data.courtId,
+        courtType: data.courtType,
+        courtNumber: data.courtNumber,
         name: data.name,
         phoneNumber: data.phoneNumber,
         date: format(data.date, "dd/MM/yyyy", { locale: ptBR }),
@@ -37,8 +34,6 @@ export default function BookingPage() {
       toast.success("Reserva confirmada!", {
         description: `${data.name} - ${format(data.date, "dd/MM/yyyy", { locale: ptBR })} às ${data.hour}`,
       })
-      setSelectedDate(undefined)
-      setSelectedTime(null)
     } catch {
       toast.error("Erro ao confirmar reserva", {
         description: "Tente novamente mais tarde.",
@@ -48,60 +43,30 @@ export default function BookingPage() {
     }
   }
 
-  const handleSelectTime = (time: string) => {
-    setSelectedTime(time)
-  }
-
-  const isFormDisabled = !selectedDate || !selectedTime
-
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-6 text-center text-2xl font-bold sm:mb-8 sm:text-3xl">Agendamento</h1>
 
-        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-          <div className="space-y-6">
-            <div>
-              <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Selecione a Data</h2>
-              <DateSelector
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
-              />
-            </div>
-
-            <div>
-              <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Selecione o Horário</h2>
-              <TimeSlotGrid
-                selectedTime={selectedTime}
-                onSelectTime={handleSelectTime}
-                availableSlots={availableSlots}
-              />
-            </div>
-          </div>
-
-          <div>
-            <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">Seus Dados</h2>
-            <BookingForm
-              onSubmit={handleBookingSubmit}
-              selectedDate={selectedDate}
-              selectedTime={selectedTime}
-            />
-            <Button
-              className="mt-4 w-full"
-              disabled={isFormDisabled || isLoading}
-              type="submit"
-              form="booking-form"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processando...
-                </>
-              ) : (
-                "Confirmar Agendamento"
-              )}
-            </Button>
-          </div>
+        <div className="mx-auto max-w-md">
+          <BookingForm
+            onSubmit={handleBookingSubmit}
+          />
+          <Button
+            className="mt-4 w-full"
+            disabled={isLoading}
+            type="submit"
+            form="booking-form"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processando...
+              </>
+            ) : (
+              "Confirmar Agendamento"
+            )}
+          </Button>
         </div>
       </div>
     </div>
