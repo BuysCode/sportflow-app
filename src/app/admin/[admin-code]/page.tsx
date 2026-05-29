@@ -94,39 +94,39 @@ export default function AdminPage() {
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-bold sm:text-3xl">Dashboard Administrativo</h1>
           <div className="flex gap-2">
-            <a href="/admin/courts" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer p-2 rounded-lg">
+            <a href="/admin/b55069a387f2211cc6791dc8/courts" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer p-2 rounded-lg">
               Gerenciar Quadras
             </a>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger className={'bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg'}>
                 Nova Reserva Manual
               </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nova Reserva Manual</DialogTitle>
-              </DialogHeader>
-              <BookingForm
-                onSubmit={handleNewReservation}
-              />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  form="booking-form"
-                  disabled={isLoading}
-                  className="bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg w-full sm:w-auto"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
-                    </>
-                  ) : (
-                    "Criar Reserva"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Nova Reserva Manual</DialogTitle>
+                </DialogHeader>
+                <BookingForm
+                  onSubmit={handleNewReservation}
+                />
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    form="booking-form"
+                    disabled={isLoading}
+                    className="bg-primary text-primary-foreground hover:bg-primary/80 cursor-pointer p-2 rounded-lg w-full sm:w-auto"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processando...
+                      </>
+                    ) : (
+                      "Criar Reserva"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 

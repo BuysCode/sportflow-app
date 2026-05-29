@@ -45,3 +45,6 @@ next-env.d.ts
 TASKS.md
 REQUIREMENTS.md
 DESIGN.md
+
+# clerk configuration (can include secrets)
+/.clerk/

@@ -8,15 +8,17 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
-
-const availableSlots = [
-  "08:00", "09:00", "10:00", "11:00",
-  "12:00", "13:00", "14:00", "15:00",
-  "16:00", "17:00", "18:00", "19:00",
-]
+import { useSession } from "@clerk/nextjs"
+import { redirect } from "next/navigation"
 
 export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(false)
+
+  const { session } = useSession()
+
+  if (!session) {
+    return redirect("/auth/signin")
+  }
 
   const handleBookingSubmit = async (data: BookingFormValues) => {
     setIsLoading(true)
